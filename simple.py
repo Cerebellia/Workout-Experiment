@@ -6,7 +6,7 @@ def get_change(current, previous):
         return ((current - previous) / previous) * -100.0
     except ZeroDivisionError:
         return 0
-df = pd.read_csv("./Tremors.csv")
+df = pd.read_csv("./Tremor.json")
 # df["startDate"] = pd.to_datetime(df['startDate'], unit='s')
 # df["endDate"] = pd.to_datetime(df['endDate'], unit='s')
 beforeWorkout = df[df["startDate"] < 671907360]

@@ -7,11 +7,13 @@ def get_change(current, previous):
         return ((current - previous) / previous) * -100.0
     except ZeroDivisionError:
         return 0
-df = pd.read_csv("./Tremors.csv")
-# df["startDate"] = pd.to_datetime(df['startDate'], unit='s')
-# df["endDate"] = pd.to_datetime(df['endDate'], unit='s')
-beforeWorkout = df[df["startDate"] < 671907360]
-afterWorkout = df[df["startDate"] > 671910660]
+df = pd.read_json("./Tremor.json")
+df["startDate"] = pd.to_datetime(df['startDate'], unit='s')
+df["endDate"] = pd.to_datetime(df['endDate'], unit='s')
+
+dfBefore = df[df["startDate"].dt.hour > 12]
+dfAfter = df[df["startDate"].dt.hour < 12]
+
 
 valuesBefore = []
 valuesAfter = []
@@ -22,30 +24,35 @@ allCols = {"mild","moderate","none","slight", "strong"}
 before = []
 after = []
 for col in allCols:
-  
-        with st.beta_expander(label=col):
+        
+        with st.expander(label=col):
                 
                 st.subheader("BEFORE")
-                st.text(beforeWorkout[col].mean())
-                st.line_chart(beforeWorkout[col])
+                st.text(dfBefore[col].mean())
+            
+                st.line_chart(dfBefore[col])
 
-                before.append(beforeWorkout[col].mean())
+                before.append(dfBefore[col].mean())
 
                 st.subheader("AFTER")
-                st.text(afterWorkout[col].mean())
-                st.line_chart(afterWorkout[col])
+                st.text(dfAfter[col].mean())
+            
+                st.line_chart(dfAfter[col])
 
-                data = [beforeWorkout[col].mean(), afterWorkout[col].mean()]
-                st.header(get_change(beforeWorkout[col].mean(), afterWorkout[col].mean()))
+                after.append(dfAfter[col].mean())
+
+        
                 
-# avgDF["before"] = valuesBefore
-# avgDF["after"] = valuesAfter
-# highestColBefore = max(before)
-# highestColAfter = max(after)
 
 
+dfValues = pd.DataFrame()
+dfValues["strong"] =  df["strong"]
+dfValues["mild"]  = df["mild"]
+dfValues["none"]  = df["none"]
+dfValues["slight"]  = df["slight"]
 
-# st.subheader("Before: " + str(before))
-# st.subheader("After: " + str(after))
+df["Dominate_Value"] = dfValues.idxmax(axis = 1)
+st.subheader("Before: " + str(before))
+st.subheader("After: " + str(after))
 st.table(df)
 
